@@ -80,7 +80,7 @@ def prediction(request):
             image = Image.open(io.BytesIO(image_data))
 
             # Preprocesa la imagen para que coincida con el formato esperado por el modelo
-            image = image.resize((224, 224)) 
+            image = image.resize((150, 150)) 
             image = np.array(image) / 255.0
             image = np.expand_dims(image, axis=0)
 
