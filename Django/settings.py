@@ -26,6 +26,12 @@ SECRET_KEY = 'django-insecure-gqs^-74$*p+6c9qslw--ghn&gj!ptk$tz*sa-5-70#g6zwjxrl
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'django-app-recofood.onrender.com/', 'django-app-recofood.onrender.com']
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+    "https://recofood.netlify.app", 
+)
 
 
 # Application definition
@@ -42,9 +48,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
