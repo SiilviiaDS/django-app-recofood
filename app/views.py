@@ -4,6 +4,8 @@ Hay que instalar esto antes de ejecutar:
     - pip install django-cors-headers
     - pip install google.generativeai
     - pip install dotenv / pip install python-dotenv
+    - pip install joblib
+    - pip install tensorflow
     - Arrancar el Servidor: python manage.py runserver 
 """
 
