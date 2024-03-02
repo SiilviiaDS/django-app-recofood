@@ -68,59 +68,36 @@ def chatbot_view(request):
         return HttpResponse(status=405)
 
 
-import tensorflow as tf
-from PIL import Image
-import io
-import numpy as np
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-
-# Ruta al modelo TensorFlow Lite
-model_path = 'model/modelo_lite.tflite'
-
-# Carga el modelo TensorFlow Lite
-interpreter = tf.lite.Interpreter(model_path=model_path)
-interpreter.allocate_tensors()
-
-# Obtén información sobre la entrada y la salida del modelo
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
-
+model = tf.keras.models.load_model('model/best_model_densenet.h5')
 @csrf_exempt
 def prediction(request):
     if request.method == "POST":
         try:
+        
             # Obtén la imagen del cuerpo de la solicitud POST
             image_data = request.FILES['imagen'].read()
+            print(image_data)
             image = Image.open(io.BytesIO(image_data))
 
             # Preprocesa la imagen para que coincida con el formato esperado por el modelo
-            image = image.resize((224, 224))
+            image = image.resize((224, 224)) 
             image = np.array(image) / 255.0
             image = np.expand_dims(image, axis=0)
 
-            # Asegúrate de que la entrada coincida con el tipo y forma esperados por el modelo
-            input_data = image.astype(np.float32)
-            interpreter.set_tensor(input_details[0]['index'], input_data)
-
-            # Realiza la inferencia
-            interpreter.invoke()
-
-            # Obtiene la salida del modelo
-            output_data = interpreter.get_tensor(output_details[0]['index'])
-            
+            # Realiza la predicción con el modelo cargado
+            prediction = model.predict(image)
             # En este ejemplo, simplemente se obtiene la clase con la mayor probabilidad
-            predicted_class = np.argmax(output_data)
+            predicted_class = np.argmax(prediction)
 
             # Devuelve la respuesta en formato JSON
             response_data = {
                 "message": "Predicción exitosa",
                 "predicted_class": int(predicted_class),
-                "confidence": float(output_data[0][predicted_class])
+                "confidence": float(prediction[0][predicted_class])
             }
             return JsonResponse(response_data)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+                return JsonResponse({"error": str(e)}, status=500)
 
     elif request.method == "GET":
         response_data = {
@@ -130,6 +107,7 @@ def prediction(request):
 
     else:
         return JsonResponse({"message": "Método no permitido"}, status=405)
+    
     
 import json
 from django.http import JsonResponse, HttpResponseBadRequest
