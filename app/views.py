@@ -68,6 +68,14 @@ def chatbot_view(request):
         return HttpResponse(status=405)
 
 
+import tensorflow as tf
+from PIL import Image
+import io
+import numpy as np
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+# Ruta al modelo TensorFlow Lite
 model_path = 'model/modelo_lite.tflite'
 
 # Carga el modelo TensorFlow Lite
@@ -92,7 +100,8 @@ def prediction(request):
             image = np.expand_dims(image, axis=0)
 
             # Asegúrate de que la entrada coincida con el tipo y forma esperados por el modelo
-            interpreter.set_tensor(input_details[0]['index'], image.astype(np.float32))
+            input_data = image.astype(np.float32)
+            interpreter.set_tensor(input_details[0]['index'], input_data)
 
             # Realiza la inferencia
             interpreter.invoke()
